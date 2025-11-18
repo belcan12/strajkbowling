@@ -1,3 +1,4 @@
+
 import React from "react";
 import bowlingLogo from "../assets/bowlinglogo.png";
 import type { BookingResponse } from "../types";
@@ -78,7 +79,7 @@ const ConfirmationView: React.FC<ConfirmationViewProps> = ({
 
         <div className="total-row">
           <span className="total-label">total</span>
-          <span className="total-value">{booking.price} sek</span>
+          <span className="total-value">{booking.price} SEK</span>
         </div>
       </section>
 

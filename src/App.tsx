@@ -28,13 +28,13 @@ const App: React.FC = () => {
 
   const navigateTo = (view: View) => {
     if (view === "confirmation" && !booking) {
+      // ingen bokning än → stanna kvar
       return;
     }
     setCurrentView(view);
   };
 
   const handleBackToBooking = () => {
-    setBooking(null);
     setCurrentView("booking");
   };
 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import bowlingLogo from "../assets/bowlinglogo.png";
 import type { BookingRequest, BookingResponse } from "../types";
@@ -45,6 +44,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
     setShoes((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Plus-knappen i sko-sektionen = lägg till spelare
   const handleAddPlayer = () => {
     const maxPlayers = lanes * 4;
     if (people >= maxPlayers) {
@@ -66,6 +66,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
     }
   };
 
+  // VG-krav: validera antal skor vs spelare + max 4 spelare per bana
   const validate = (): boolean => {
     if (!date || !time) {
       setErrorMessage("Välj datum och tid.");
@@ -126,15 +127,33 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
       };
 
       const response = await createBooking(bookingRequest);
-      onBookingSuccess(response);
+
+      const merged: BookingResponse = {
+        ...bookingRequest,
+        ...response,
+        price:
+          response.price ??
+          bookingRequest.people * 120 + bookingRequest.lanes * 100,
+        id:
+          (response as any).id ??
+          (response as any).bookingId ??
+          (response as any).bookingID ??
+          `local-${Date.now()}`,
+      };
+
+      console.log("Booking från API:", response);
+      console.log("Booking som används i UI:", merged);
+
+      onBookingSuccess(merged);
     } catch (error) {
       console.error(error);
-      let message = "Något gick fel med bokningen. Försök igen om en stund.";
+      let message =
+        "Något gick fel med bokningen. Försök igen om en stund.";
 
       if (error instanceof Error) {
         if (error.message === "Failed to fetch") {
           message =
-            "Kunde inte nå bokningsservern (CORS/internet-fel). Prova igen strax eller be läraren kolla servern.";
+            "Kunde inte nå bokningsservern. Kontrollera din internetuppkoppling och försök igen.";
         } else {
           message = error.message;
         }
@@ -238,7 +257,9 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
                     className="field-input"
                     placeholder="Euro 44"
                     value={size}
-                    onChange={(e) => handleChangeShoe(index, e.target.value)}
+                    onChange={(e) =>
+                      handleChangeShoe(index, e.target.value)
+                    }
                   />
                 </div>
                 {people > 1 && (

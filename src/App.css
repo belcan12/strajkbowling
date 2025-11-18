@@ -25,13 +25,14 @@ body {
 
 .app-shell {
   position: relative;
-  max-width: 360px;
+  max-width: 430px; 
   width: 100%;
   min-height: 100vh;
   background-color: #ffeef3; 
   padding: 16px 20px 24px;
 }
 
+/* Hamburgermenyn */
 
 .hamburger-button {
   position: absolute;
@@ -64,6 +65,7 @@ body {
   padding-top: 56px; 
 }
 
+/* Logo */
 
 .logo-row {
   display: flex;
@@ -100,7 +102,6 @@ body {
   margin-top: 4px;
 }
 
-/* Rubriker */
 
 .page-title {
   margin-top: 32px;
@@ -240,7 +241,6 @@ body {
   cursor: pointer;
 }
 
-/* Knapp längst ner */
 
 .primary-button {
   margin-top: 24px;
@@ -270,7 +270,6 @@ body {
   font-size: 13px;
 }
 
-/* Confirmation – detaljer */
 
 .booking-details-section {
   margin-top: 32px;
@@ -347,17 +346,12 @@ body {
   text-decoration: underline;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1;
-}
 
-#people,
-#lanes {
+.stepper-input {
   caret-color: transparent;
 }
 
-#people:focus,
-#lanes:focus {
-  outline: none;
+.stepper-input::-webkit-inner-spin-button,
+.stepper-input::-webkit-outer-spin-button {
+  opacity: 1;
 }
