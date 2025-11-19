@@ -44,7 +44,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
     setShoes((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Plus-knappen i sko-sektionen = lägg till spelare
+  
   const handleAddPlayer = () => {
     const maxPlayers = lanes * 4;
     if (people >= maxPlayers) {
@@ -57,6 +57,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
     setPeople((prev) => prev + 1);
   };
 
+  // Tillåt bara upp/ned-pilar 
   const handleStepperKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
@@ -66,7 +67,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
     }
   };
 
-  // VG-krav: validera antal skor vs spelare + max 4 spelare per bana
+  // Validering av formulär + VG-krav
   const validate = (): boolean => {
     if (!date || !time) {
       setErrorMessage("Välj datum och tid.");
@@ -84,6 +85,8 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
     }
 
     const maxPlayers = lanes * 4;
+
+    
     if (people > maxPlayers) {
       setErrorMessage(
         `Max 4 spelare per bana. Med ${lanes} bana/banaor kan du ha max ${maxPlayers} spelare.`
@@ -91,6 +94,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
       return false;
     }
 
+    
     if (shoes.length !== people) {
       setErrorMessage("Antalet skostorlekar måste matcha antalet spelare.");
       return false;
@@ -128,21 +132,27 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
 
       const response = await createBooking(bookingRequest);
 
+      // Slå ihop request + response och säkra alla fält till confirmation
       const merged: BookingResponse = {
         ...bookingRequest,
         ...response,
+        when: response.when ?? bookingRequest.when,
+        lanes: (response as any).lanes ?? bookingRequest.lanes,
+        people: (response as any).people ?? bookingRequest.people,
+        shoes: (response as any).shoes ?? bookingRequest.shoes,
         price:
-          response.price ??
+          (response as any).price ??
           bookingRequest.people * 120 + bookingRequest.lanes * 100,
         id:
           (response as any).id ??
           (response as any).bookingId ??
           (response as any).bookingID ??
           `local-${Date.now()}`,
+        active:
+          typeof (response as any).active === "boolean"
+            ? (response as any).active
+            : true,
       };
-
-      console.log("Booking från API:", response);
-      console.log("Booking som används i UI:", merged);
 
       onBookingSuccess(merged);
     } catch (error) {
@@ -215,7 +225,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
               id="people"
               type="number"
               min={1}
-              className="field-input"
+              className="field-input stepper-input"
               value={people}
               onChange={(e) =>
                 setPeople(Math.max(1, Number(e.target.value) || 1))
@@ -232,7 +242,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
               id="lanes"
               type="number"
               min={1}
-              className="field-input"
+              className="field-input stepper-input"
               value={lanes}
               onChange={(e) =>
                 setLanes(Math.max(1, Number(e.target.value) || 1))
@@ -257,9 +267,7 @@ const BookingView: React.FC<BookingViewProps> = ({ onBookingSuccess }) => {
                     className="field-input"
                     placeholder="Euro 44"
                     value={size}
-                    onChange={(e) =>
-                      handleChangeShoe(index, e.target.value)
-                    }
+                    onChange={(e) => handleChangeShoe(index, e.target.value)}
                   />
                 </div>
                 {people > 1 && (

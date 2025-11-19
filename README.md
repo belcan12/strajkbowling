@@ -1,73 +1,104 @@
-# React + TypeScript + Vite
+# Strajk Bowling 🎳
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+En bokningsapp för bowlinghallen Strajk Bowling i Bromölla.
 
-Currently, two official plugins are available:
+Appen är mobilanpassad och designad efter den givna Figma-skissen, med fokus på en layout som motsvarar ungefär iPhone 14 Pro Max (ca 430px bredd).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Teknik
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- TypeScript
+- Vite
+- CSS (ingen UI-ramverk, custom styling enligt skiss)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Funktionalitet / kravkoppling
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Booking-vy
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Användaren kan:
+  - välja datum och tid
+  - ange antal spelare
+  - ange antal banor
+- Vid antal spelare dyker formulärfält upp för:
+  - skostorlek per spelare
+- Skickar en booking request till backend (via `/api/booking` → Vite-proxy i `vite.config.ts`).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Confirmation-vy
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Visar bekräftelse efter lyckad bokning:
+  - datum + tid (when)
+  - antal spelare (people)
+  - antal banor (lanes)
+  - bokningsnummer (id från API:t)
+  - totalpris (price):
+    - 120 kr / person
+    - 100 kr / bana
+    - priset räknas på serversidan
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Meny
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Hamburgermeny uppe till vänster.
+- Vid klick öppnas en overlay-meny med:
+  - BOOKING
+  - CONFIRMATION (endast klickbar efter att en bokning finns).
+
+Felhantering (instabil server)
+
+- Om backend svarar med fel (t.ex. ungefär var femte gång) visas ett tydligt felmeddelande för användaren.
+- Nätverksfel (Failed to fetch) hanteras separat med ett användarvänligt meddelande.
+
+---
+
+## Validering (VG-krav)
+
+I `BookingView.tsx` finns validering i funktionen `validate()`:
+
+- Antal skor vs antal spelare:
+  - `shoes.length` måste matcha `people`
+  - alla skofält måste vara ifyllda
+  - skostorlekar måste vara siffror
+- Max 4 spelare per bana:
+  - max antal spelare = `lanes * 4`
+  - om användaren försöker ha fler spelare än tillåtet visas ett felmeddelande
+- Grundvalidering:
+  - datum och tid måste vara valda
+  - minst 1 spelare
+  - minst 1 bana
+
+Dessutom hjälper plus-knappen i sko-sektionen till att hålla antal spelare och skor synkade i UI:t.
+
+---
+
+## Så kör du projektet lokalt
+
+1. Klona repot:
+
+   ```bash
+   git clone https://github.com/belcan12/strajkbowling.git
+   cd strajkbowling
+
+2. Installera dependencies:
+
+   npm install
+
+3. Starta dev-servern:
+
+   npm run dev
+
+4. Öppna den URL som Vite visar ( http://localhost:5173).
+
+Vite är konfigurerat i `vite.config.ts` att proxya API-anrop till:
+
+- GET /api/key → https://731xy9c2ak.execute-api.eu-north-1.amazonaws.com/key
+- POST /api/booking → https://731xy9c2ak.execute-api.eu-north-1.amazonaws.com/booking
+
+---
+
+## Responsivitet
+
+- Gränssnittet är byggt för mobilvy.
+- Layouten är anpassad till ungefär iPhone 14 Pro Max-bredd för att ligga nära Figma-skissen.
