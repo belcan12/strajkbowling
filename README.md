@@ -46,10 +46,11 @@ Appen är mobilanpassad och designad efter den givna Figma-skissen, med fokus p�
   - BOOKING
   - CONFIRMATION (endast klickbar efter att en bokning finns).
 
-Felhantering (instabil server)
+### Felhantering (instabil server)
 
 - Om backend svarar med fel (t.ex. ungefär var femte gång) visas ett tydligt felmeddelande för användaren.
-- Nätverksfel (Failed to fetch) hanteras separat med ett användarvänligt meddelande.
+- Nätverksfel (`Failed to fetch`) hanteras separat med ett användarvänligt meddelande.
+- För säkerhets skull mergas booking-requesten med svaret från API:t, så om något fält saknas från servern används klientens värden som fallback.
 
 ---
 
